@@ -19,7 +19,7 @@ int main (int argc, char *argv[]){
 
     if(rank==0){    //ogni processo userà rand inizializzato diversamente in modo da generare numeri diversi però il processo principale gestisce la cosa
         ifstream inprimes;
-        inprimes.open("../RandomGenerator/Primes");  
+        inprimes.open("RandomGenerator/Primes");  
         for(int i=1; i<size; i++){      //il processo 0 passsa agli altri l'inizializzazione
             if(ReadIthLine(inprimes, i+30, p1, p2)){
                 MPI_Send(&p1, 1, MPI_INT, i, 0, MPI_COMM_WORLD);
@@ -38,7 +38,7 @@ int main (int argc, char *argv[]){
         ReadIthLine(inprimes, 0, p1, p2);
         inprimes.close();  
 
-        ifstream input("../RandomGenerator/seed.in");
+        ifstream input("RandomGenerator/seed.in");
         string property;
         if(input.is_open()){
             while(!input.eof() ){

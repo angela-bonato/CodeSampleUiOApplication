@@ -8,8 +8,7 @@
 #include <sstream>
 #include "city.h"
 #include "path.h"
-#include "../libGen.h"
-#include "../RandomGenerator/random.h"
+#include "RandomGenerator/random.h"
 
 using namespace std;
 
