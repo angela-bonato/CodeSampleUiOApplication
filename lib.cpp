@@ -1,9 +1,35 @@
-#include "lib9.h"
+#include "lib.h"
 
 using namespace std;
 
+void InizRandom(Random& rnd){
+    int seed[4];
+    int p1, p2;
+    ifstream Primes("RandomGenerator/Primes");
+    if (Primes.is_open()){
+        Primes >> p1 >> p2 ;
+    } 
+    else cerr << "PROBLEM: Unable to open Primes." << endl;
+    Primes.close();
+
+    ifstream input("RandomGenerator/seed.in");
+    string property;
+    if (input.is_open()){
+        while ( !input.eof() ){
+            input >> property;
+            if( property == "RANDOMSEED" ){
+                input >> seed[0] >> seed[1] >> seed[2] >> seed[3];
+                rnd.SetRandom(seed,p1,p2);
+            }
+        }
+        input.close();
+    } 
+    else cerr << "PROBLEM: Unable to open seed.in ." << endl;
+}
+
 vector<City> InitCircularCities(int N){
-    //assumo la circonferenza con raggio 1. per semplicità, ergo io estraggo un angolo e x,y sono dati da suo cos e sin
+    //Uses unitary circumference for simplicity, 
+    //x and y coordinates are defined as cos and sin of a randomly selected angle
     Random rand;
     InizRandom(rand);
 
@@ -26,7 +52,7 @@ vector<City> InitCircularCities(int N){
 }
 
 vector<City> InitSquareCities(int N){
-    //assumo il quadrato con lato 1. per semplicità
+    //Uses square with unitary side for simplicity
     Random rand;
     InizRandom(rand);
 
@@ -86,6 +112,9 @@ vector<Path> InitRandomPop(Random& rand, int N, int P){
 }
 
 void CrossoverOperator(Random& rand, Path p1, Path p2, Path& s1, Path& s2, double pc){
+    //Cuts mother and father at the same point, before the cut everything stays the same,
+    //after the cut mother's remaining elements as ordered in father and vice versa,
+    //generates two sons from this operation
     double r=rand.Rannyu();
 
     if(r<=pc){
@@ -110,7 +139,7 @@ void CrossoverOperator(Random& rand, Path p1, Path p2, Path& s1, Path& s2, doubl
         s1.set_ord(one);
         s2.set_ord(two);
 
-        if(!s1.IsValid() || !s2.IsValid()) cout << "Invalid crossover" << endl;
+        if(!s1.IsValid() || !s2.IsValid()) cout << "Invalid crossover." << endl;
     }
 
     else{
@@ -120,22 +149,25 @@ void CrossoverOperator(Random& rand, Path p1, Path p2, Path& s1, Path& s2, doubl
 }
 
 void MutationOperator(Random& rand, Path& path, double pm1, double pm2, double pm3, double pm4){
-    //tutte le mutazioni devono preservare primo e ultimo elemento!
+    //Final mutation is composed by a mixture of up to 4 mutations:
+    //with probability r1 performs first mutation, with r2 the second and so on untill the fourth possible mutation
+
+    //First and last elements excluded from all kinds of mutation (otherwise invalid Path)
     int l=path.get_length()-1;
 
     double r1=rand.Rannyu();
     if(r1<=pm1){
-        //prima mutazione: swap fra due elementi scelti a caso (escluso primo e ultimo)
+        //First mutation: swap between two randomly-chosen elements
         int a=int(rand.Rannyu(1, l));
         int b=int(rand.Rannyu(1, l));
         while(a==b) b=int(rand.Rannyu(1, l));
         Swap(path, a, b);
-        if(!path.IsValid()) cout << "Mut1 invalid" << endl;
+        if(!path.IsValid()) cout << "Mut1 invalid." << endl;
     }
 
     double r2=rand.Rannyu();
     if(r2<=pm2){
-        //seconda mutazione: shifto in avanti i primi m elementi di n posti
+        //Second mutation: first m elemts undergo n shifts
         int m=int(rand.Rannyu(1, l));
         int n=int(rand.Rannyu(1, l));
         vector<int> one;
@@ -158,21 +190,21 @@ void MutationOperator(Random& rand, Path& path, double pm1, double pm2, double p
             }
         }
 
-        if(!path.IsValid()) cout << "Mut2 invalid" << endl;
+        if(!path.IsValid()) cout << "Mut2 invalid." << endl;
     }
 
     double r3=rand.Rannyu();
     if(r3<=pm3){
-        //terza mutazione: scambio m elementi contigui nella prima metà con m elementi contigui nella seconda metà
+        //Third mutation: m neighboring elements in the first half are swapped with m neighboring in the second half
         int m=int(rand.Rannyu(1, l/2));
         int mid=l/2;
         for(int i=1; i<m; i++) Swap(path, i, mid+i);
-        if(!path.IsValid()) cout << "Mut3 invalid" << endl;
+        if(!path.IsValid()) cout << "Mut3 invalid." << endl;
     }
 
     double r4=rand.Rannyu();
     if(r4<=pm4){
-        //quarta mutazione: inverto l'ordine di un gruppo di m elementi da una posizione n in poi
+        //Fourth mutation: inverts the order of m neighboring elements starting at position n
         int m=int(rand.Rannyu(1, l/2));
         int n=int(rand.Rannyu(1, l));
         for(int i=0; i<(m/2); i++){
@@ -183,7 +215,7 @@ void MutationOperator(Random& rand, Path& path, double pm1, double pm2, double p
             Swap(path, left, right);
         }
 
-        if(!path.IsValid()) cout << "Mut4 invalid" << endl;
+        if(!path.IsValid()) cout << "Mut4 invalid." << endl;
     }
 }
 
@@ -193,7 +225,7 @@ bool ComparePaths(Path a, Path b){
 
 void WriteBest(vector<Path> population, int s, ofstream& bout, ofstream& bhout){
     if(bout.is_open()) bout << scientific << population[0].get_loss() << endl;
-    else cerr << "Errore: impossibile aprire bestloss.dat" << endl;
+    else cerr << "Error: unable to open bestloss.dat ." << endl;
 
     double mean=0.0;
     for(int i=0; i<int(population.size())/2; i++){
@@ -208,20 +240,21 @@ void WriteBest(vector<Path> population, int s, ofstream& bout, ofstream& bhout){
     stdev=sqrt(stdev/(double(population.size())/2.0));
 
     if(bhout.is_open()) bhout << scientific << mean << "  " << scientific << stdev << endl;
-    else cerr << "Errore: impossibile aprire besthalfloss.dat" << endl;
+    else cerr << "Error: unable to open besthalfloss.dat ." << endl;
 }
 
 vector<Path> ReplaceGeneration(Random& rand, vector<Path> old_population, vector<City> cities, int N, double pc, double pm1, double pm2, double pm3, double pm4, int s, ofstream& bout, ofstream& bhout, Path& best_path){
     int np=old_population.size();
     for(int i=0; i<np; i++) old_population[i].EvalLoss(cities);
-    sort(old_population.begin(), old_population.end(), ComparePaths);   //ordino la popolazione in modo che l'indice più basso sia quello del path con loss più bassa
+    //Sorts population such that lowest index corresponds to lowest loss function Path
+    sort(old_population.begin(), old_population.end(), ComparePaths);   
 
     WriteBest(old_population, s, bout, bhout);
     if(old_population[0].get_loss() < best_path.get_loss()) best_path=old_population[0];
 
     vector<Path> new_population;
     while(int(new_population.size())<=np-2){
-        //a questo punto sfrutto l'ordinamento per estrarre con la probabilità desiderata
+        //Here sorting is used so that best paths are more likely to be extract
         double r1=rand.Rannyu();
         int e1=int(np*pow(r1, 5));
         double r2=rand.Rannyu();
@@ -248,6 +281,7 @@ vector<Path> ReplaceGeneration(Random& rand, vector<Path> old_population, vector
 }
 
 void TravSalesProb(vector<City> cities,int N, int P, int S, double pc, double pm1, double pm2, double pm3, double pm4, ofstream& bout, ofstream& bhout, ofstream& pout){
+    //cities generated either on the circumference or in the square
     Random rand;   
     InizRandom(rand);
     vector<Path> starting_population=InitRandomPop(rand, cities.size(), P);
@@ -258,7 +292,7 @@ void TravSalesProb(vector<City> cities,int N, int P, int S, double pc, double pm
     for(int s=0; s<S; s++){
         new_population=ReplaceGeneration(rand, starting_population, cities, N, pc, pm1, pm2, pm3, pm4, s, bout, bhout, best_path);
         starting_population=new_population;
-        cout << "Rimpiazzata popolazione " << s << endl;
+        cout << "Replaced population " << s << endl;
     }
 
     if(pout.is_open()){
@@ -267,7 +301,7 @@ void TravSalesProb(vector<City> cities,int N, int P, int S, double pc, double pm
             pout <<  scientific << cities[best_path.get_ord(i)].get_x() << "  " << scientific << cities[best_path.get_ord(i)].get_y() <<  endl;
         }
     }
-    else cerr << "Errore: impossibile aprire bestpath.dat" << endl;
+    else cerr << "Error: unable to open bestpath.dat ." << endl;
 
     rand.SaveSeed();
 }

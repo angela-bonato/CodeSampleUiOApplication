@@ -9,33 +9,35 @@
 
 using namespace std;
 
+//Definition of class Path
+
 class Path{
     private:
-        //non tengo in memoria un vector di città ma solo gli int che identificano le città
+        //I don't need to store a vector of City type objects, I just need to know their order
         vector<int> _order;  
-        //lunghezza di _order
+        //Length of _order
         int _L;
-        //valore della loss function calcolato 
+        //Loss function value 
         double _loss;  
-        //numero di città considerate
+        //Number of cities under consideration
         int _Nc; 
 
     public:
-        //accesso a order completo
+        //Reading and Writing access to the whole _order
         vector<int> get_ord();  
         void set_ord(vector<int> myord);
-        //accesso a order per componente
+        //Reading and Writing access to a single component of _order
         int get_ord(int index);  
         void set_ord(int index, int value);  
-        //setta Nc
+        //Set number of cities
         void set_Nc(int N);
-        //restituisce L
+        //Reads length of _order
         int get_length();
-        //controlla che il path rispetti tutti i vincoli imposti dal problema  
+        //Check whether Path complies with the constraints of the problem
         bool IsValid();  
-        //calcola la loss function del percorso, prende in ingresso il vettore delle città da analizzare secondo l'ordine che ha il path come membro   
+        //Evaluates the loss function for the cities under examitation ordered as defined by _order   
         void EvalLoss(vector<City> cities);  
-        //accesso alla loss
+        //Reads the loss function
         double get_loss();  
 };
 

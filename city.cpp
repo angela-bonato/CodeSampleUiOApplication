@@ -2,6 +2,7 @@
 
 using namespace std;
 
+//Reading access
 double City::get_x(){
     return _x;
 }
@@ -14,6 +15,7 @@ int City::get_n(){
     return _n;
 }
 
+//Writing access
 void City::set_x(double myx){
     _x=myx;
 }

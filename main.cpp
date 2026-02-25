@@ -1,23 +1,23 @@
-#include "lib9.h"
+#include "lib.h"
 
 using namespace std;
 
 int main (int argc, char *argv[]){
-    //variabili generali
-    int Ncities=34; //numero città considerate
-    int Npaths=900;  //numero path per ogni generazione DEVONO ESSERE PARI
-    int Nsteps=200;    //numero generazioni considerate
-    double pc=0.6;  //probabilità di crossover
-    double pm1=0.07; //probabilità prima mutazione
-    double pm2=0.06; //probabilità seconda mutazione
-    double pm3=0.05; //probabilità terza mutazione
-    double pm4=0.04; //probabilità quarta mutazione
-    ofstream bout;  //output loss del best path di ogni generazione
-    ofstream bhout;  //output loss media dei primi N/2 best path di ogni generazione
-    ofstream pout;  //output miglior percorso in assoluto
+    //General variables definitions
+    int Ncities=34; //Number of cities, arbitrary
+    int Npaths=900;  //Number of paths for each generation, must be an even number
+    int Nsteps=200;    //Number of generations, appropriate to ensure convergence
+    double pc=0.6;  //Crossover probability
+    double pm1=0.07; //Probability of first mutation happening
+    double pm2=0.06; //Probability of second mutation happening
+    double pm3=0.05; //Probability of third mutation happening
+    double pm4=0.04; //Probability of fourth mutation happening
+    ofstream bout;  //Loss function of the best path in each generation
+    ofstream bhout;  //Average loss function of the best half of each generation 
+    ofstream pout;  //Best possible path
 
-    //problema commesso viaggiatore con città su una circonferenza
-    cout << "Inizio analisi città circolari" << endl;
+    //TSP on the circumference
+    cout << "Beginning analysis on the circumference." << endl;
     vector<City> CircCities=InitCircularCities(Ncities);
     bout.open("cbestloss.dat");
     bhout.open("cbesthalfloss.dat");
@@ -27,9 +27,9 @@ int main (int argc, char *argv[]){
     bhout.close();
     pout.close();
 
-    //problema commesso viaggiatore con città in un quadrato
-    cout << "Inizio analisi città quadrate" << endl;
-    Nsteps=400;  //meno banale, servono più generazioni
+    //TSP in the square
+    cout << "Beginning analysis in the square." << endl;
+    Nsteps=400;  //Less trivial, more generations are needed
     vector<City> SqCities=InitSquareCities(Ncities);
     bout.open("sbestloss.dat");
     bhout.open("sbesthalfloss.dat");
@@ -39,6 +39,6 @@ int main (int argc, char *argv[]){
     bhout.close();
     pout.close();
 
-    cout << "Fine analisi" << endl;
+    cout << "End of all analyses." << endl;
     return 0;
 }

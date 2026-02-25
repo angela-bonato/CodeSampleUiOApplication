@@ -2,6 +2,7 @@
 
 using namespace std;
 
+//Reading and Writing access methods
 vector<int> Path::get_ord(){
     return _order;
 }
@@ -27,19 +28,25 @@ void Path::set_ord(int index, int value){
 int Path::get_length(){
     return _L;
 }
+
+double Path::get_loss(){
+   return _loss;
+}
    
+//Checks for Path
 bool Path::IsValid(){
     if(int(_order.size())!=(_Nc+1)) {
-        cerr << "Path invalido: lunghezza sbagliata." << endl;
-        return false;    //tutte le città più la prima ripetuta
+        cerr << "Path not valid: wrong lenght." << endl;
+        return false;    //Path must cover all cities so
     }
     if(_order[0]!=_order[_Nc]){
-        cerr << "Path invalido: prima e ultima città non coincidenti." << endl;
-        return false;    //la prima e l'ultima città devono essere uguali
+        cerr << "Path not valid: first and last cities are different." << endl;
+        return false;    //Path must be closed
     }
     if(_order[0]!=0){
-        cerr << "Path invalido: prima città non 0." << endl;
-        return false;      //fisso la prima (ergo l'ultima) città come quella con city.n=0
+        cerr << "Path not valid: first city must be 0." << endl;
+        return false;      //First (and last city) fixed such that city.n=0, 
+                           //paths that have the same order but for a shift are considered equivalent
     }
     vector<int> theor_counts(_Nc, 0);
     vector<int> counts(_Nc, 0);
@@ -48,13 +55,15 @@ bool Path::IsValid(){
         counts[_order[i]]+=1;
     }
     if(counts!=theor_counts){
-        cerr << "Path invalido: città ripetute o mancanti." << endl;
-        return false;      //ogni città deve esserci una e una sola volta, a parte la 0 che deve esserci solo a inizio e fine
+        cerr << "Path not valid: either missing or repeated." << endl;
+        return false;      //Checks city by city to ensure that all cities appear exactly one time 
+                           //a part from the first and last one which has city.n=0 at this point
     }
     return true;
 }     
-         
-void Path::EvalLoss(vector<City> cities){      //come metrica per calcolare la distanza in L^1
+ 
+//Loss function evaluation as L^1 distance
+void Path::EvalLoss(vector<City> cities){
     double sum=0.;
     for(int i=0; i<_Nc; i++){
         sum+=fabs(cities[_order[i]].get_x() - cities[_order[i+1]].get_x());
@@ -63,6 +72,3 @@ void Path::EvalLoss(vector<City> cities){      //come metrica per calcolare la d
     _loss=sum;
 }
 
- double Path::get_loss(){
-    return _loss;
- }

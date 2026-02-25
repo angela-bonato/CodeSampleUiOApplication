@@ -3,17 +3,18 @@
 
 using namespace std;
 
+//Definition of class City
+
 class City {
-    public: //altrimenti casini con MPI
-        //Coordinate della città
+    private:
+        //Coordinates of the city
         double _x;   
         double _y;
-        //Nome della città
+        //NAme of the city
         int _n;      
 
-        //costruttore
-        City(double x=0.0, double y=0.0, int n=0) : _x(x), _y(y), _n(n) {}
-        //Funzioni di accesso ai membri privati(in lettura o scrittura)
+    public:
+        //Methods to access (in writing or reading mode) private members 
         double get_x();     
         double get_y();
         int get_n();
