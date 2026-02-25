@@ -15,10 +15,6 @@ void Path::set_Nc(int N){
     _Nc=N;
 }
 
-int Path::get_Nc(){
-    return _Nc;
-}
-
 int Path::get_ord(int index){
     return _order[index];
 } 
@@ -65,10 +61,6 @@ void Path::EvalLoss(vector<City> cities){      //come metrica per calcolare la d
         sum+=fabs(cities[_order[i]].get_y() - cities[_order[i+1]].get_y());
     }
     _loss=sum;
-}
-
-void Path::set_loss(double loss){
-    _loss=loss;
 }
 
  double Path::get_loss(){

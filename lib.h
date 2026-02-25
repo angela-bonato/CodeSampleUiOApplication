@@ -3,20 +3,17 @@
 #include <iomanip>
 #include <iostream>
 #include <numeric>
-#include <fstream>
-#include <string>
-#include <sstream>
 #include "city.h"
 #include "path.h"
-#include "RandomGenerator/random.h"
+#include "../libGen.h"
+#include "../RandomGenerator/random.h"
 
 using namespace std;
 
-//leggo solo la riga i di un file
-bool ReadIthLine(ifstream& inprimes, int i, int& p1, int& p2);
-
-//funzione che ritorna un vettore di città con posizioni nel file di input
-vector<City> InitCities(ifstream& infile);
+//funzione che ritorna un vettore con N città posizionate randomicamente su una circonferenza
+vector<City> InitCircularCities(int N);
+//funzione che ritorna un vettore con N città posizionate randomicamente dentro ad un quadrato
+vector<City> InitSquareCities(int N);
 
 //scambia fra loro gli elementi in posizione a e b di path._order
 void Swap(Path& path, int a, int b);
@@ -34,3 +31,6 @@ bool ComparePaths(Path a, Path b);
 void WriteBest(vector<Path> population, int s, ofstream& bout, ofstream& bhout);
 //operatore di selezione, fa già tutte le operazioni necessarie per restituire la nuova popolazione
 vector<Path> ReplaceGeneration(Random& rand, vector<Path> old_population, vector<City> cities, int N, double pc, double pm1, double pm2, double pm3, double pm4, int s, ofstream& bout, ofstream& bhout, Path& best_path);
+
+//funzione che esegue l'analisi richiesta
+void TravSalesProb(vector<City> cities, int N, int P, int S, double pc, double pm1, double pm2, double pm3, double pm4, ofstream& bout, ofstream& bhout, ofstream& pout);

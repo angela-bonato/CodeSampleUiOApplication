@@ -29,15 +29,13 @@ class Path{
         void set_ord(int index, int value);  
         //setta Nc
         void set_Nc(int N);
-        int get_Nc();
         //restituisce L
         int get_length();
         //controlla che il path rispetti tutti i vincoli imposti dal problema  
         bool IsValid();  
         //calcola la loss function del percorso, prende in ingresso il vettore delle città da analizzare secondo l'ordine che ha il path come membro   
-        void EvalLoss(vector<City> cities); 
+        void EvalLoss(vector<City> cities);  
         //accesso alla loss
-        void set_loss(double loss); 
         double get_loss();  
 };
 

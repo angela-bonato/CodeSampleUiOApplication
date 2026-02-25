@@ -1,59 +1,54 @@
-#include "lib10.h"
+#include "lib9.h"
 
 using namespace std;
 
-bool ReadIthLine(ifstream& inprimes, int i, int& p1, int& p2){
-    if(inprimes.is_open()){
-        string line;
-        int current_line = 0;
+vector<City> InitCircularCities(int N){
+    //assumo la circonferenza con raggio 1. per semplicità, ergo io estraggo un angolo e x,y sono dati da suo cos e sin
+    Random rand;
+    InizRandom(rand);
 
-        while(current_line < i && getline(inprimes, line)){     //scorro fino ad arrivare alla riga i
-            ++current_line;
-        }
-        
-        if(current_line == i && getline(inprimes, line)){       //leggo riga i-sima e estraggo i valori
-            istringstream iss(line);
-            if(iss >> p1 >> p2) return true;    //tutto andato a buon fine
-            else{
-                cerr << "Errore nella lettura dei valori dalla riga " << i << " di Primes." << std::endl;
-                return false;
-            }
-        } 
-        else {
-            cerr << "Errore: il file Primes non ha abbastanza righe." << std::endl;
-            return false;
-        }
-    }
-    else{
-        cerr << "Errore: impossibile aprire Primes" << endl;
-        return false;
-    }
-}
-
-vector<City> InitCities(ifstream& infile){
-    //prendo coordinate città da file, nel codice poi setterò il numero delle città da analizzare in base alla lunghezza del vector di output in modo che sia generale 
     vector<City> vec;
-    int i=0;
 
-    if(infile.is_open()){
-        while(!infile.eof()){
-            double x,y;
-            infile >> x >> y;
+    for(int i=0; i<N; i++){
+        double theta=rand.Rannyu(0, 2*M_PI);
+        
+        City city;
+        city.set_n(i);
+        city.set_x(cos(theta));
+        city.set_y(sin(theta));
 
-            City new_city;
-            new_city.set_x(x);
-            new_city.set_y(y);
-            new_city.set_n(i);
-            vec.push_back(new_city);
+        vec.push_back(city);
+    }
 
-            i++;
-        }
-        infile.close();
-    } 
-    else cerr << "Errore: impossibile aprire file di input città." << endl;
-    
+    rand.SaveSeed();
+
     return vec;
 }
+
+vector<City> InitSquareCities(int N){
+    //assumo il quadrato con lato 1. per semplicità
+    Random rand;
+    InizRandom(rand);
+
+    vector<City> vec;
+
+    for(int i=0; i<N; i++){
+        double a=rand.Rannyu();
+        double b=rand.Rannyu();
+        
+        City city;
+        city.set_n(i);
+        city.set_x(a);
+        city.set_y(b);
+
+        vec.push_back(city);
+    }
+
+    rand.SaveSeed();
+
+    return vec;
+}
+
 
 void Swap(Path& path, int a, int b){
     int copy=path.get_ord(a);
@@ -250,4 +245,29 @@ vector<Path> ReplaceGeneration(Random& rand, vector<Path> old_population, vector
     }
 
     return new_population;
+}
+
+void TravSalesProb(vector<City> cities,int N, int P, int S, double pc, double pm1, double pm2, double pm3, double pm4, ofstream& bout, ofstream& bhout, ofstream& pout){
+    Random rand;   
+    InizRandom(rand);
+    vector<Path> starting_population=InitRandomPop(rand, cities.size(), P);
+    vector<Path> new_population;
+    Path best_path=starting_population[0];
+    best_path.EvalLoss(cities);
+
+    for(int s=0; s<S; s++){
+        new_population=ReplaceGeneration(rand, starting_population, cities, N, pc, pm1, pm2, pm3, pm4, s, bout, bhout, best_path);
+        starting_population=new_population;
+        cout << "Rimpiazzata popolazione " << s << endl;
+    }
+
+    if(pout.is_open()){
+        pout << "#" << scientific << best_path.get_loss() << endl;
+        for(int i=0; i<int(best_path.get_ord().size()); i++){
+            pout <<  scientific << cities[best_path.get_ord(i)].get_x() << "  " << scientific << cities[best_path.get_ord(i)].get_y() <<  endl;
+        }
+    }
+    else cerr << "Errore: impossibile aprire bestpath.dat" << endl;
+
+    rand.SaveSeed();
 }
