@@ -13,5 +13,11 @@ city.o : city.cpp city.h
 	$(CC) -c city.cpp -o city.o $(CFLAGS)
 path.o : path.cpp path.h
 	$(CC) -c path.cpp -o path.o $(CFLAGS)
+
+compile: main.exe
+
+run: main.exe
+	./main.exe
+
 clean :
-	rm *.o main.exe seed.out
+	rm -f *.o main.exe *.out
